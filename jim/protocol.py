@@ -41,6 +41,7 @@ class Code:
 class Message:
 
     _DEF_ENCODING = 'utf-8'
+    _MAX_LENGTH = 640
 
     ACTION_PRESENCE = 'presence'
     ACTION_PROBE = 'probe'
@@ -80,6 +81,10 @@ class Message:
     @staticmethod
     def parse(message, encoding=_DEF_ENCODING):
         return json.loads(message.decode(encoding))
+
+    @staticmethod
+    def get_max_length():
+        return Message._MAX_LENGTH
 
 
 if __name__ == '__main__':
