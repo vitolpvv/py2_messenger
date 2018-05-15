@@ -21,11 +21,11 @@ if __name__ == '__main__':
 
     addr = None
     p = None
+    client = None
 
     try:
         addr = sys.argv[_IN_PARAM_ADDRESS_INDEX]
     except (ValueError, IndexError):
-        # print('Не задан адрес подключения')
         addr = _DEFAULT_ADDRESS
 
     try:
@@ -33,9 +33,14 @@ if __name__ == '__main__':
     except (ValueError, IndexError):
         p = _DEFAULT_PORT
 
-    if addr:
+    try:
+        client = Client(addr, p)
+        print('Клиент подключен:', (addr, p))
+    except ConnectionRefusedError as e:
+        print('Ошибка подключения:', e.strerror)
+
+    if client:
         try:
-            client = Client(addr, p)
             client.close()
-        except ConnectionRefusedError as e:
-            print('Ошибка подключения:', e.strerror)
+        except Exception as e:
+            print('Ошибка взаимодействия:', e.args)

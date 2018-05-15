@@ -9,6 +9,9 @@ class Server:
         self._socket.bind((address, port))
         self._socket.listen(count)
 
+    def get_name(self):
+        return self._socket.getsockname()
+
     def accept(self):
         return self._socket.accept()
 
@@ -25,6 +28,7 @@ if __name__ == '__main__':
 
     addr = None
     p = None
+    server = None
 
     try:
         addr = sys.argv[sys.argv.index(_IN_PARAM_ADDR) + 1]
@@ -36,14 +40,19 @@ if __name__ == '__main__':
     except (ValueError, IndexError):
         p = _DEFAULT_PORT
 
-    s = Server(addr, p)
-    print('Сервер запущен {}:{}'.format(addr, p))
     try:
-        while True:
-            print('Сервер ожидает подключения...')
-            client_socket, client_address = s.accept()
-            print('Подключен клиент: {}'.format(client_address))
-            client_socket.close()
-    except KeyboardInterrupt:
-        s.close()
-        print('Сервер остановлен')
+        server = Server(addr, p)
+        print('Сервер запущен:', server.get_name())
+    except OSError as e:
+        print('Ошибка запуска:', e.strerror)
+
+    if server:
+        try:
+            while True:
+                print('Сервер ожидает подключения...')
+                client_socket, client_address = server.accept()
+                print('Подключен клиент: {}'.format(client_address))
+                client_socket.close()
+        except KeyboardInterrupt:
+            server.close()
+            print('Сервер остановлен')
