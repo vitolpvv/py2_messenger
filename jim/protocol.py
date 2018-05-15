@@ -1,3 +1,7 @@
+import json
+import time
+
+
 class Code:
     C_100 = '100'
     C_101 = '101'
@@ -32,3 +36,49 @@ class Code:
     @staticmethod
     def get_description(code):
         return Code._DESCRIPTION.get(str(code))
+
+
+class Message:
+
+    _DEF_ENCODING = 'utf-8'
+
+    ACTION_PRESENCE = 'presence'
+    ACTION_PROBE = 'probe'
+    ACTION_MSG = 'msg'
+    ACTION_QUIT = 'quit'
+    ACTION_AUTH = 'authenticate'
+    ACTION_LEAVE = 'leave'
+    ACTION_JOIN = 'join'
+
+    @staticmethod
+    def set_encoding(coding_type):
+        Message._DEF_ENCODING = coding_type
+
+    @staticmethod
+    def get_encoding():
+        return Message._DEF_ENCODING
+
+    @staticmethod
+    def request_presence(encoding=_DEF_ENCODING):
+        return '{{' \
+               '"action": {},' \
+               '"time": {}' \
+               '}}\n'.format(Message.ACTION_PRESENCE, time.time()).encode(encoding)
+
+    @staticmethod
+    def response(code, text=None, encoding=_DEF_ENCODING):
+        if Code.get_description(code) is None:
+            return None
+        return '{{' \
+               '"response": {},' \
+               '"time": {},'\
+               '"text": "{}"'\
+               '}}\n'.format(code, time.time(), text if text else '').encode(encoding)
+
+    @staticmethod
+    def parse(message, encoding=_DEF_ENCODING):
+        return json.loads(message.decode(encoding))
+
+
+if __name__ == '__main__':
+    pass
