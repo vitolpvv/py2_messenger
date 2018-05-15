@@ -60,20 +60,22 @@ class Message:
 
     @staticmethod
     def request_presence(encoding=_DEF_ENCODING):
-        return '{{' \
-               '"action": {},' \
-               '"time": {}' \
-               '}}\n'.format(Message.ACTION_PRESENCE, time.time()).encode(encoding)
+        message = {
+            'action': Message.ACTION_PRESENCE,
+            'time': time.time()
+        }
+        return json.dumps(message).encode(encoding)
 
     @staticmethod
     def response(code, text=None, encoding=_DEF_ENCODING):
         if Code.get_description(code) is None:
             return None
-        return '{{' \
-               '"response": {},' \
-               '"time": {},'\
-               '"text": "{}"'\
-               '}}\n'.format(code, time.time(), text if text else '').encode(encoding)
+        message = {
+            'response': code,
+            'time': time.time(),
+            'text': text if text else ''
+        }
+        return json.dumps(message).encode(encoding)
 
     @staticmethod
     def parse(message, encoding=_DEF_ENCODING):
