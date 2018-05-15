@@ -1,5 +1,6 @@
 import socket
 import sys
+import jim.protocol as protocol
 
 
 class Client:
@@ -7,6 +8,12 @@ class Client:
     def __init__(self, address, port):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.connect((address, port))
+
+    def send(self, message):
+        self._socket.send(message)
+
+    def read(self):
+        return protocol.Message.parse(self._socket.recv(protocol.Message.get_max_length()))
 
     def close(self):
         self._socket.close()
@@ -41,6 +48,12 @@ if __name__ == '__main__':
 
     if client:
         try:
-            client.close()
+            print('Отправка сообщения о присутствии')
+            client.send(protocol.Message.request_presence())
+
+            msg = client.read()
+            print('Получен ответ:', msg)
         except Exception as e:
             print('Ошибка взаимодействия:', e.args)
+        finally:
+            client.close()
