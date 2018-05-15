@@ -43,6 +43,11 @@ class Message:
     _DEF_ENCODING = 'utf-8'
     _MAX_LENGTH = 640
 
+    KEY_ACTION = 'action'
+    KEY_TIME = 'time'
+    KEY_RESPONSE = 'response'
+    KEY_TEXT = 'text'
+
     ACTION_PRESENCE = 'presence'
     ACTION_PROBE = 'probe'
     ACTION_MSG = 'msg'
@@ -62,8 +67,8 @@ class Message:
     @staticmethod
     def request_presence(encoding=_DEF_ENCODING):
         message = {
-            'action': Message.ACTION_PRESENCE,
-            'time': time.time()
+            Message.KEY_ACTION: Message.ACTION_PRESENCE,
+            Message.KEY_TIME: time.time()
         }
         return json.dumps(message).encode(encoding)
 
@@ -72,9 +77,9 @@ class Message:
         if Code.get_description(code) is None:
             return None
         message = {
-            'response': code,
-            'time': time.time(),
-            'text': text if text else ''
+            Message.KEY_RESPONSE: code,
+            Message.KEY_TIME: time.time(),
+            Message.KEY_TEXT: text if text else ''
         }
         return json.dumps(message).encode(encoding)
 
