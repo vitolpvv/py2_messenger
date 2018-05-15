@@ -60,11 +60,11 @@ if __name__ == '__main__':
             while True:
                 print('Сервер ожидает подключения...')
                 client_socket, client_address = server.accept()
-
                 print('Подключен клиент: {}'.format(client_address))
-                msg = server.read(client_socket)
 
+                msg = server.read(client_socket)
                 print('Получено от {}: {}'.format(client_address, msg))
+                
                 if msg.get(protocol.Message.KEY_ACTION) == protocol.Message.ACTION_PRESENCE:
                     server.send_response(client_socket, protocol.Code.C_200)
 
