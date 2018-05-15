@@ -1,4 +1,5 @@
 import socket
+import sys
 
 
 class Server:
@@ -16,11 +17,33 @@ class Server:
 
 
 if __name__ == '__main__':
-    print('Скрипт запущен самостоятельно')
-    s = Server('localhost', 8888)
+
+    _DEFAULT_ADDRESS = ''
+    _DEFAULT_PORT = 7777
+    _IN_PARAM_ADDR = '-a'
+    _IN_PARAM_PORT = '-p'
+
+    addr = None
+    p = None
+
     try:
-        print('Сервер ожидает подключения...')
+        addr = sys.argv[sys.argv.index(_IN_PARAM_ADDR) + 1]
+    except (ValueError, IndexError):
+        addr = _DEFAULT_ADDRESS
+
+    try:
+        p = int(sys.argv[sys.argv.index(_IN_PARAM_PORT) + 1])
+    except (ValueError, IndexError):
+        p = _DEFAULT_PORT
+
+    s = Server(addr, p)
+    print('Сервер запущен {}:{}'.format(addr, p))
+    try:
         while True:
-            client_socket, address_address = s.accept()
+            print('Сервер ожидает подключения...')
+            client_socket, client_address = s.accept()
+            print('Подключен клиент: {}'.format(client_address))
+            client_socket.close()
     except KeyboardInterrupt:
         s.close()
+        print('Сервер остановлен')
