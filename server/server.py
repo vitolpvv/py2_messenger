@@ -1,5 +1,6 @@
 import socket
 import sys
+import jim.protocol as protocol
 
 
 class Server:
@@ -14,6 +15,14 @@ class Server:
 
     def accept(self):
         return self._socket.accept()
+
+    @staticmethod
+    def send_response(client, code, text=None):
+        client.send(protocol.Message.response(code, text))
+
+    @staticmethod
+    def read(client):
+        return protocol.Message.parse(client.recv(protocol.Message.get_max_length()))
 
     def close(self):
         self._socket.close()
@@ -51,8 +60,14 @@ if __name__ == '__main__':
             while True:
                 print('Сервер ожидает подключения...')
                 client_socket, client_address = server.accept()
+
                 print('Подключен клиент: {}'.format(client_address))
+                msg = server.read(client_socket)
+
+                print('Получено от {}: {}'.format(client_address, msg))
+                if msg.get(protocol.Message.KEY_ACTION) == protocol.Message.ACTION_PRESENCE:
+                    server.send_response(client_socket, protocol.Code.C_200)
+
                 client_socket.close()
-        except KeyboardInterrupt:
+        finally:
             server.close()
-            print('Сервер остановлен')
