@@ -13,7 +13,11 @@ class Client:
         self._socket.send(message)
 
     def read(self):
-        return protocol.Message.parse(self._socket.recv(protocol.Message.get_max_length()))
+        return self._socket.recv(protocol.Message.get_max_length())
+
+    @staticmethod
+    def parse(message):
+        return protocol.Message.parse(message)
 
     def close(self):
         self._socket.close()
@@ -52,6 +56,7 @@ if __name__ == '__main__':
             client.send(protocol.Message.request_presence())
 
             msg = client.read()
+            msg = client.parse(msg)
             print('Получен ответ:', msg)
         except Exception as e:
             print('Ошибка взаимодействия:', e.args)
