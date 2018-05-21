@@ -17,12 +17,19 @@ class Server:
         return self._socket.accept()
 
     @staticmethod
-    def send_response(client, code, text=None):
-        client.send(protocol.Message.response(code, text))
+    def send(client, message):
+        client.send(message)
+
+    def send_response(self, client, code, text=None):
+        self.send(client, protocol.Message.response(code, text))
 
     @staticmethod
     def read(client):
-        return protocol.Message.parse(client.recv(protocol.Message.get_max_length()))
+        return client.recv(protocol.Message.get_max_length())
+
+    @staticmethod
+    def parse(message):
+        return protocol.Message.parse(message)
 
     def close(self):
         self._socket.close()
@@ -63,6 +70,7 @@ if __name__ == '__main__':
                 print('Подключен клиент: {}'.format(client_address))
 
                 msg = server.read(client_socket)
+                msg = server.parse(msg)
                 print('Получено от {}: {}'.format(client_address, msg))
                 
                 if msg.get(protocol.Message.KEY_ACTION) == protocol.Message.ACTION_PRESENCE:
