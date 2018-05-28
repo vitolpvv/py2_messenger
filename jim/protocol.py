@@ -47,6 +47,12 @@ class Message:
     KEY_TIME = 'time'
     KEY_RESPONSE = 'response'
     KEY_TEXT = 'text'
+    KEY_USER = 'user'
+    KEY_USER_NAME = 'name'
+    KEY_USER_PASS = 'password'
+    KEY_MSG_TO = 'to'
+    KEY_MSG_FROM = 'from'
+    KEY_MSG_MESSAGE = 'message'
 
     ACTION_PRESENCE = 'presence'
     ACTION_PROBE = 'probe'
@@ -65,12 +71,29 @@ class Message:
         return Message._DEF_ENCODING
 
     @staticmethod
-    def request_presence(encoding=_DEF_ENCODING):
+    def request_presence(name='Guest', encoding=_DEF_ENCODING):
         message = {
             Message.KEY_ACTION: Message.ACTION_PRESENCE,
-            Message.KEY_TIME: time.time()
+            Message.KEY_TIME: time.time(),
+            Message.KEY_USER: {
+                Message.KEY_USER_NAME: name
+            }
+
         }
-        return json.dumps(message).encode(encoding)
+        return Message.to_bytes(message, encoding)
+
+    @staticmethod
+    def request_message(name_from, name_to, message='', encoding=_DEF_ENCODING):
+        if message == '':
+            return None
+        message = {
+            Message.KEY_ACTION: Message.ACTION_MSG,
+            Message.KEY_TIME: time.time(),
+            Message.KEY_MSG_FROM: name_from,
+            Message.KEY_MSG_TO: name_to,
+            Message.KEY_MSG_MESSAGE: message
+        }
+        return Message.to_bytes(message, encoding)
 
     @staticmethod
     def response(code, text=None, encoding=_DEF_ENCODING):
@@ -81,11 +104,15 @@ class Message:
             Message.KEY_TIME: time.time(),
             Message.KEY_TEXT: text if text else ''
         }
-        return json.dumps(message).encode(encoding)
+        return Message.to_bytes(message, encoding)
 
     @staticmethod
     def parse(message, encoding=_DEF_ENCODING):
         return json.loads(message.decode(encoding))
+
+    @staticmethod
+    def to_bytes(message, encoding=_DEF_ENCODING):
+        return json.dumps(message).encode(encoding)
 
     @staticmethod
     def get_max_length():
