@@ -1,64 +1,41 @@
 import socket
 import sys
+sys.path.append('..')
 import jim.protocol as protocol
+from log.log_deco import Log
+import logging
+import log_config
 
 
 class Client:
 
-    def __init__(self, address, port):
+    def __init__(self, address, port, name='Guest', login=None, password=None):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.connect((address, port))
+        self._name = name
+        self._login = login
+        self._password = password
 
+    @Log(logging.getLogger('client'))
     def send(self, message):
         self._socket.send(message)
 
+    @Log(logging.getLogger('client'))
     def read(self):
         return self._socket.recv(protocol.Message.get_max_length())
 
+    def get_name(self):
+        return self._name
+
     @staticmethod
+    @Log(logging.getLogger('client'))
     def parse(message):
         return protocol.Message.parse(message)
 
+    @Log(logging.getLogger('client'))
     def close(self):
         self._socket.close()
 
 
 if __name__ == '__main__':
-
-    _DEFAULT_ADDRESS = 'localhost'
-    _DEFAULT_PORT = 7777
-    _IN_PARAM_ADDRESS_INDEX = 1
-    _IN_PARAM_PORT_INDEX = 2
-
-    addr = None
-    p = None
-    client = None
-
-    try:
-        addr = sys.argv[_IN_PARAM_ADDRESS_INDEX]
-    except (ValueError, IndexError):
-        addr = _DEFAULT_ADDRESS
-
-    try:
-        p = int(sys.argv[_IN_PARAM_PORT_INDEX])
-    except (ValueError, IndexError):
-        p = _DEFAULT_PORT
-
-    try:
-        client = Client(addr, p)
-        print('Клиент подключен:', (addr, p))
-    except ConnectionRefusedError as e:
-        print('Ошибка подключения:', e.strerror)
-
-    if client:
-        try:
-            print('Отправка сообщения о присутствии')
-            client.send(protocol.Message.request_presence())
-
-            msg = client.read()
-            msg = client.parse(msg)
-            print('Получен ответ:', msg)
-        except Exception as e:
-            print('Ошибка взаимодействия:', e.args)
-        finally:
-            client.close()
+    pass
