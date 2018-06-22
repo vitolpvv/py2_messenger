@@ -39,7 +39,7 @@ class Server:
     @staticmethod
     @Log(logging.getLogger('server'))
     def parse(message):
-        return protocol.Message.parse(message)
+        return protocol.Converter.from_bytes(message)
 
     @Log(logging.getLogger('server'))
     def close(self):

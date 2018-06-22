@@ -58,7 +58,7 @@ def _send_messages(server, clients, messages, valid_clients):
     for message in messages:
         for client in clients:
             try:
-                server.send(client, protocol.Message.to_bytes(message))
+                server.send(client, protocol.Converter.to_bytes(message))
             except:
                 valid_clients.pop(valid_clients.index(client))
                 client.close()
