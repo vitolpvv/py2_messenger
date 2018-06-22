@@ -30,7 +30,7 @@ class Client:
     @staticmethod
     @Log(logging.getLogger('client'))
     def parse(message):
-        return protocol.Message.parse(message)
+        return protocol.Converter.from_bytes(message)
 
     @Log(logging.getLogger('client'))
     def close(self):
