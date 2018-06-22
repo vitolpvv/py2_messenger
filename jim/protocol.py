@@ -38,9 +38,28 @@ class Code:
         return Code._DESCRIPTION.get(str(code))
 
 
-class Message:
+class Converter:
 
     _DEF_ENCODING = 'utf-8'
+
+    @staticmethod
+    def set_encoding(coding_type):
+        Converter._DEF_ENCODING = coding_type
+
+    @staticmethod
+    def get_encoding():
+        return Converter._DEF_ENCODING
+
+    @staticmethod
+    def from_bytes(message, encoding=None):
+        return json.loads(message.decode(Converter._DEF_ENCODING if encoding is None else encoding))
+
+    @staticmethod
+    def to_bytes(message, encoding=None):
+        return json.dumps(message).encode(Converter._DEF_ENCODING if encoding is None else encoding)
+
+
+class Message:
     _MAX_LENGTH = 640
 
     KEY_ACTION = 'action'
@@ -63,15 +82,7 @@ class Message:
     ACTION_JOIN = 'join'
 
     @staticmethod
-    def set_encoding(coding_type):
-        Message._DEF_ENCODING = coding_type
-
-    @staticmethod
-    def get_encoding():
-        return Message._DEF_ENCODING
-
-    @staticmethod
-    def request_presence(name='Guest', encoding=_DEF_ENCODING):
+    def request_presence(name='Guest', encoding=None):
         message = {
             Message.KEY_ACTION: Message.ACTION_PRESENCE,
             Message.KEY_TIME: time.time(),
@@ -80,10 +91,10 @@ class Message:
             }
 
         }
-        return Message.to_bytes(message, encoding)
+        return Converter.to_bytes(message, encoding)
 
     @staticmethod
-    def request_message(name_from, name_to, message='', encoding=_DEF_ENCODING):
+    def request_message(name_from, name_to, message='', encoding=None):
         if message == '':
             return None
         message = {
@@ -93,10 +104,10 @@ class Message:
             Message.KEY_MSG_TO: name_to,
             Message.KEY_MSG_MESSAGE: message
         }
-        return Message.to_bytes(message, encoding)
+        return Converter.to_bytes(message, encoding)
 
     @staticmethod
-    def response(code, text=None, encoding=_DEF_ENCODING):
+    def response(code, text=None, encoding=None):
         if Code.get_description(code) is None:
             return None
         message = {
@@ -104,15 +115,7 @@ class Message:
             Message.KEY_TIME: time.time(),
             Message.KEY_TEXT: text if text else ''
         }
-        return Message.to_bytes(message, encoding)
-
-    @staticmethod
-    def parse(message, encoding=_DEF_ENCODING):
-        return json.loads(message.decode(encoding))
-
-    @staticmethod
-    def to_bytes(message, encoding=_DEF_ENCODING):
-        return json.dumps(message).encode(encoding)
+        return Converter.to_bytes(message, encoding)
 
     @staticmethod
     def get_max_length():
